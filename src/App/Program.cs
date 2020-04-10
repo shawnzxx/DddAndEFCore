@@ -1,7 +1,7 @@
-﻿using System.IO;
-using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.IO;
+using System.Linq;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 namespace App
 {
@@ -9,30 +9,21 @@ namespace App
     {
         public static void Main()
         {
-            string connectionString = GetConnectionString();
-            ILoggerFactory loggerFactory = CreateLoggerFactory();
-
-            var optionsBuilder = new DbContextOptionsBuilder<SchoolContext>();
-            optionsBuilder
-                .UseSqlServer(connectionString)
-                .UseLoggerFactory(loggerFactory)
-                .EnableSensitiveDataLogging();
-
-            using (var context = new SchoolContext(optionsBuilder.Options))
-            {
-                Student student = context.Students.Find(1L);
-            }
+            string result1 = Execute(x => x.DisenrollStudent(1, 2));
+            string result2 = Execute(x => x.CheckStudentFavoriteCourse(1, 2));
+            string result3 = Execute(x => x.EnrollmentStudent(1, 2, Grade.A));
         }
 
-        private static ILoggerFactory CreateLoggerFactory()
+        private static string Execute(Func<StudentController, string> func)
         {
-            return LoggerFactory.Create(builder =>
+            string connectionString = GetConnectionString();
+            bool useConsoleLogger = true; // use IHostingEnviroment.IsDevelopment for ASP.net project
+
+            using (var context = new SchoolContext(connectionString, useConsoleLogger))
             {
-                builder
-                    .AddFilter((category, level) =>
-                        category == DbLoggerCategory.Database.Command.Name && level == LogLevel.Information)
-                    .AddConsole();
-            });
+                var controller = new StudentController(context);
+                return func(controller);
+            }
         }
 
         private static string GetConnectionString()
