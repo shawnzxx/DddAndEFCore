@@ -11,8 +11,8 @@ namespace App
         //so keep private setter class method can change property value
         
         //public long Id { get; private set; }
-        public string Name { get; private set; }
-        public string Email { get; private set; }
+        public virtual Name Name { get; private set; }
+        public Email Email { get; private set; }
         //Use navigation property instead of FavoriteCourseId
         public virtual Course FavoriteCourse { get; private set; }
         //Use BackingField for collection relationship
@@ -32,7 +32,7 @@ namespace App
         //How to define what inputs we need? It based on Student class constrain
         //Like in here we need all three name, email and favoriteCourseId to creat a valid Student object
         public Student(
-            string name, string email, Course favoriteCourse, Grade favoriteCourseGrade)
+            Name name, Email email, Course favoriteCourse, Grade favoriteCourseGrade)
             : this()
         {
             Name = name;
@@ -40,13 +40,6 @@ namespace App
             FavoriteCourse = favoriteCourse;
             //enroll course at constructor level
             EnrollIn(favoriteCourse, favoriteCourseGrade);
-        }
-
-        public void UpdateStudentInfo(string newName, string newEmail, Course newFavoriteCourse)
-        {
-            Name = newName;
-            Email = newEmail;
-            FavoriteCourse = newFavoriteCourse;
         }
 
         public string EnrollIn(Course course, Grade grade)
@@ -60,7 +53,6 @@ namespace App
             return "OK";
         }
 
-
         public void Disenroll(Course course)
         {
             Enrollment enrollment = _enrollments.FirstOrDefault(x => x.Course == course);
@@ -69,6 +61,23 @@ namespace App
                 return;
 
             _enrollments.Remove(enrollment);
+        }
+
+        public void EditPersonalInfo(Name name, Email email, Course newFavoriteCourse)
+        {
+            if (name == null)
+                throw new ArgumentException();
+            if (email == null)
+                throw new ArgumentException();
+            if (newFavoriteCourse == null)
+                throw new ArgumentException();
+
+            //in real project can use function to check null
+            //Guard.NotNull(name, email, newFavoriteCourse);
+
+            Name = name;
+            Email = email;
+            FavoriteCourse = newFavoriteCourse;
         }
     }
 }

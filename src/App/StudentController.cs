@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace App
@@ -64,13 +65,30 @@ namespace App
         }
 
         public string RegisterStudent(
-            string name, string email, long favoriteCourseId, Grade favoriteCourseGrade)
+            string firstName, string lastName, long nameSuffixId, string email, 
+            long favoriteCourseId, Grade favoriteCourseGrade)
         {
             Course favoriteCourse = Course.FromId(favoriteCourseId);
             if (favoriteCourse == null)
                 return "Course not found";
 
-            var student = new Student(name, email, favoriteCourse, favoriteCourseGrade);
+            Suffix suffix = Suffix.FromId(nameSuffixId);
+            if (suffix == null)
+                return "Suffix not found";
+
+            Result<Email> emailResult = Email.Create(email);
+            if (emailResult.IsFailure)
+                return emailResult.Error;
+
+            Result<Name> nameResult = Name.Create(firstName, lastName, suffix);
+            if (nameResult.IsFailure)
+                return nameResult.Error;
+
+            var student = new Student(
+                nameResult.Value, 
+                emailResult.Value,
+                favoriteCourse,
+                favoriteCourseGrade);
             _repository.Save(student);
 
             _context.SaveChanges();
@@ -79,7 +97,7 @@ namespace App
         }
 
         public string EditPersonalInfo(
-            long studentId, string name, string email, long favoriteCourseId)
+            long studentId, string firstName, long nameSuffixId, string lastName, string email, long favoriteCourseId)
         {
             Student student = _repository.GetById(studentId);
             if (student == null)
@@ -89,7 +107,19 @@ namespace App
             if (favoriteCourse == null)
                 return "Course not found";
 
-            student.UpdateStudentInfo(name, email, favoriteCourse);
+            Suffix suffix = Suffix.FromId(nameSuffixId);
+            if (suffix == null)
+
+                return "Suffix not found";
+            Result<Email> emailResult = Email.Create(email);
+            if (emailResult.IsFailure)
+                return emailResult.Error;
+
+            Result<Name> nameResult = Name.Create(firstName, lastName, suffix);
+            if (nameResult.IsFailure)
+                return nameResult.Error;
+
+            student.EditPersonalInfo(nameResult.Value, emailResult.Value, favoriteCourse);
 
             _context.SaveChanges();
 
