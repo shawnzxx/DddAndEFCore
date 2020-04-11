@@ -31,11 +31,22 @@ namespace App
         //5: Inside the custom constructor we no need to provide all fields(like here we don't have Id field)
         //How to define what inputs we need? It based on Student class constrain
         //Like in here we need all three name, email and favoriteCourseId to creat a valid Student object
-        public Student(string name, string email, Course favoriteCourse)
+        public Student(
+            string name, string email, Course favoriteCourse, Grade favoriteCourseGrade)
+            : this()
         {
             Name = name;
             Email = email;
             FavoriteCourse = favoriteCourse;
+            //enroll course at constructor level
+            EnrollIn(favoriteCourse, favoriteCourseGrade);
+        }
+
+        public void UpdateStudentInfo(string newName, string newEmail, Course newFavoriteCourse)
+        {
+            Name = newName;
+            Email = newEmail;
+            FavoriteCourse = newFavoriteCourse;
         }
 
         public string EnrollIn(Course course, Grade grade)
