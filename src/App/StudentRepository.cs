@@ -38,7 +38,7 @@ namespace App
 
         public void Save(Student student)
         {
-            _context.Students.Attach(student);
+            _context.Students.Add(student);
 
             EntityState entityState1 = _context.Entry(student).State;
             EntityState entityState2 = _context.Entry(student.FavoriteCourse).State;

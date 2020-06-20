@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using CSharpFunctionalExtensions;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,7 @@ namespace App
             _repository = new StudentRepository(context);
         }
 
-        public string CheckStudentFavoriteCourse(long studentId, long courseId)
+        public string CheckStudentFavoriteCourse(long studentId, Guid courseId)
         {
             Student student = _repository.GetById(studentId);
             if (student == null)
@@ -29,7 +30,7 @@ namespace App
             return student.FavoriteCourse == course ? "Yes" : "No";
         }
 
-        public string EnrollmentStudent(long studentId, long courseId, Grade grade)
+        public string EnrollmentStudent(long studentId, Guid courseId, Grade grade)
         {
             Student student = _repository.GetById(studentId);
 
@@ -47,7 +48,7 @@ namespace App
             return result;
         }
 
-        public string DisenrollStudent(long studentId, long courseId)
+        public string DisenrollStudent(long studentId, Guid courseId)
         {
             Student student = _repository.GetById(studentId);
             if (student == null)
@@ -65,10 +66,12 @@ namespace App
         }
 
         public string RegisterStudent(
-            string firstName, string lastName, long nameSuffixId, string email, 
-            long favoriteCourseId, Grade favoriteCourseGrade)
+            string firstName, string lastName, Guid nameSuffixId, string email, 
+            Guid favoriteCourseId, Grade favoriteCourseGrade)
         {
-            Course favoriteCourse = Course.FromId(favoriteCourseId);
+            Course favoriteCourse = _context.Courses.Find(favoriteCourseId); //retrieve from db attached object
+
+            //Course favoriteCourse = Course.FromId(favoriteCourseId); //create from local, detached object 
             if (favoriteCourse == null)
                 return "Course not found";
 
@@ -85,6 +88,7 @@ namespace App
                 return nameResult.Error;
 
             var student = new Student(
+                Guid.NewGuid(),
                 nameResult.Value, 
                 emailResult.Value,
                 favoriteCourse,
@@ -97,7 +101,7 @@ namespace App
         }
 
         public string EditPersonalInfo(
-            long studentId, string firstName, long nameSuffixId, string lastName, string email, long favoriteCourseId)
+            long studentId, string firstName, Guid nameSuffixId, string lastName, string email, Guid favoriteCourseId)
         {
             Student student = _repository.GetById(studentId);
             if (student == null)

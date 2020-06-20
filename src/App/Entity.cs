@@ -4,13 +4,13 @@ namespace App
 {
     public abstract class Entity
     {
-        public long Id { get; }
+        public Guid Id { get; set; }
 
         protected Entity()
         {
         }
 
-        protected Entity(long id)
+        protected Entity(Guid id)
             : this()
         {
             Id = id;
@@ -27,7 +27,7 @@ namespace App
             if (GetRealType() != other.GetRealType())
                 return false;
 
-            if (Id == 0 || other.Id == 0)
+            if (Id == default || other.Id == default)
                 return false;
 
             return Id == other.Id;

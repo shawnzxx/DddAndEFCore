@@ -10,7 +10,6 @@ namespace App
         //it will use backing field by default, but we may need to change some of property value
         //so keep private setter class method can change property value
         
-        //public long Id { get; private set; }
         public virtual Name Name { get; private set; }
         public Email Email { get; private set; }
         //Use navigation property instead of FavoriteCourseId
@@ -31,10 +30,11 @@ namespace App
         //5: Inside the custom constructor we no need to provide all fields(like here we don't have Id field)
         //How to define what inputs we need? It based on Student class constrain
         //Like in here we need all three name, email and favoriteCourseId to creat a valid Student object
-        public Student(
+        public Student(Guid id,
             Name name, Email email, Course favoriteCourse, Grade favoriteCourseGrade)
             : this()
         {
+            Id = id;
             Name = name;
             Email = email;
             FavoriteCourse = favoriteCourse;

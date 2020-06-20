@@ -15,7 +15,6 @@ namespace App
         private readonly bool _useConsoleLogger;
         public DbSet<Student> Students { get; set; }
         public DbSet<Course> Courses { get; set; }
-
         public SchoolContext(string connectionString, bool useConsoleLogger)
         {
             _connectionString = connectionString;
@@ -49,7 +48,7 @@ namespace App
             modelBuilder.Entity<Student>(x =>
             {
                 x.ToTable("Student").HasKey(k => k.Id);
-                x.Property(p => p.Id).HasColumnName("StudentID");
+                x.Property(p => p.Id).HasColumnName("StudentID").ValueGeneratedOnAdd();
                 x.Property(p => p.Email)
                 .HasConversion(
                     p => p.Value, 
@@ -60,7 +59,7 @@ namespace App
                 {
                     //for navigation object inside the value object 
                     //we need declare shadow property first map it to the correct name
-                    p.Property<long?>("NameSuffixID").HasColumnName("NameSuffixID");
+                    p.Property<Guid>("NameSuffixID").HasColumnName("NameSuffixID");
                     //Name property consist three fileds
                     //How to map three fileds to the db columns
                     p.Property(pp => pp.First).HasColumnName("FirstName");
@@ -75,19 +74,19 @@ namespace App
             modelBuilder.Entity<Suffix>(x =>
             {
                 x.ToTable("Suffix").HasKey(p => p.Id);
-                x.Property(p => p.Id).HasColumnName("SuffixID");
+                x.Property(p => p.Id).HasColumnName("SuffixID").ValueGeneratedOnAdd();
                 x.Property(p => p.Name);
             });
             modelBuilder.Entity<Course>(x =>
             {
                 x.ToTable("Course").HasKey(k => k.Id);
-                x.Property(p => p.Id).HasColumnName("CourseID");
+                x.Property(p => p.Id).HasColumnName("CourseID").ValueGeneratedOnAdd();
                 x.Property(p => p.Name);
             });
             modelBuilder.Entity<Enrollment>(x =>
             {
                 x.ToTable("Enrollment").HasKey(k => k.Id);
-                x.Property(p => p.Id).HasColumnName("EnrollmentID");
+                x.Property(p => p.Id).HasColumnName("EnrollmentID").ValueGeneratedOnAdd();
                 x.HasOne(p => p.Student).WithMany(p => p.Enrollments);
                 x.HasOne(p => p.Course).WithMany();
                 x.Property(p => p.Grade);
